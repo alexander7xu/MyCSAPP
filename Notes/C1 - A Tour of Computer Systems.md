@@ -11,12 +11,11 @@ const char bytes[] = {0x41, 0x42, 0x43, 0};
 printf("cstring  %s\n", bytes);
 printf("float    %f\n", *(float *)bytes);
 printf("int32_t  %" PRId32 "\n", *(int32_t *)bytes);
-
-/* output
+```
+```
 cstring  ABC
 float    0.000000
 int32_t  4407873
-*/
 ```
 
 ## 1.4 Processors Read and Interpret Instructions Stored in Memory
@@ -47,13 +46,12 @@ beg = clock();
 int64_t a64 = 0x1234, b64 = 0x5678;
 for (register int64_t i = 0; i < kMaxCount; ++i) a64 += b64, b64 += a64;
 printf("int64_t    %" PRId64 "\n", clock() - beg);
-
-/* output
+```
+```
 WORD_SIZE  8
 int16_t    10264
 int32_t    9880
 int64_t    9733
-*/
 ```
 
 #### Main Memory
@@ -78,16 +76,15 @@ void ViewMemory(const uint8_t *beg, const uint8_t *end) {
 
 // In main function
 ViewMemory((uint8_t *)&SayHello, (uint8_t *)&SayBye);
-
-/* output
+```
+```
 401550  55 48 89 E5 48 83 EC 20 48 8D 0D A1 2A 00 00 E8
 401560  FC 15 00 00 90 48 83 C4 20 5D C3
-*/
-
-/* found in executable
+```
+in the executable file:
+```
 950     55 48 89 E5 48 83 EC 20 48 8D 0D A1 2A 00 00 E8
 960     FC 15 00 00 90 48 83 C4 20 5D C3 55 48 89 E5 48
-*/
 ```
 
 ## 1.5 Caches Matter

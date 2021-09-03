@@ -28,11 +28,11 @@ puts("big endian machine");
 uint32_t x = 0x12345678;
 uint32_t y = __builtin_bswap32(x);
 printf("%x\n%x\n", x, y);
-/* output
+```
+```
 little endian machine
 0x12345678
 0x78563412
-*/
 ```
 
 ### 2.1.4 Representing Strings
@@ -51,12 +51,11 @@ printf("strlen: %d\nsizeof: %d", strlen(kHello), sizeof(kHello));
 char *buf = (char *)malloc(strlen(kHello));
 // strcpy(dst, src) will copy the null character from src to dst
 strcpy(buf, kHello);
-// to solve this bug, replace strlen(kHello) with strlen(kHello) + 1
-
-/* output
+// to fix this bug, replace strlen(kHello) with strlen(kHello) + 1
+```
+```
 strlen: 5
 sizeof: 6
-*/
 ```
 
 ### 2.1.9 Shift Operations in C
@@ -66,10 +65,10 @@ The C standards do not precisely define which type of right shift should be used
 ```c
 printf("0x%X\n", (int16_t)0x8086 >> 8);
 printf("0x%X\n", (uint16_t)0x8086 >> 8);
-/* output
+```
+```
 0xFFFFFF80
 0x80
-*/
 ```
 
 ## 2.2 Integer Representations
