@@ -143,12 +143,23 @@ int IsUintAddOverflow(unsigned int x, unsigned int y) {
 
 $TMin_{w} = -TMin_{w}$
 
+### 2.3.4 Unsigned Multiplication
+
+$x*_w^uy=(x*y)\mod 2^w$
 
 ### 2.3.5 Two’s-Complement Multiplication
 
+$x*_w^ty=U2T_w((x*y)\mod 2^w)$
+
 Although the bit-level representations of the full products may differ, **those of the truncated products are identical.**
 
-No matter unsigned or two’s-complement, addition or multiplication, we could **do the corresponding operaterion then discard overflowed bits in bit-level representation**. In numeric representation, because discarding bits is equivalent to set those bits as zero, it looks like $Mod 2^w$ in unsigned case.
+> For Example:
+> 
+> $-3 * 3 = B2T_3([101]) * B2T_3([011]) = B2T_6([111101] * [000011]) = B2T_6([111101] + [111010]) = B2T_6([110111]) = -9, -9\mod 2^3 = -1 = B2T_3([111])$
+>
+> $5 * 3 = B2U_3([101]) * B2U_3([011]) = B2U_6([000101] * [000011]) = B2U_6([000101] + [001010]) = B2U_6([001111]) = 15, 15\mod 2^3 = 7 = B2U_3([111])$
+
+No matter unsigned or two’s-complement, addition or multiplication, we could **do the corresponding operaterion then discard overflowed bits in bit-level representation**. In numeric representation, because discarding bits is equivalent to set those bits as zero, it looks like $\mod 2^w$ in unsigned case.
 
 ## 2.4 Floating Point
 
