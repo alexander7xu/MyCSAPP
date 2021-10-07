@@ -81,7 +81,10 @@ x86-64 imposes the restriction that a move instruction cannot have both operands
 
 For most cases, the `MOV` instructions will only update the specific register bytes or memory locations indicated by the destination operand. The only exception is that **when `movl` has a register as the destination, it will also set the high-order 4 bytes of the register to 0.**
 
-**The regular `movq` instruction can only have immediate source operands that can be represented as 32-bit two’s-complement numbers.** This value is then sign extended to produce the 64-bit value for the destination. The `movabsq` instruction can have an arbitrary 64-bit immediate value as its source operand and can only have a register as a destination.
+**The regular `movq` instruction can only have immediate source operands that can be represented as 32-bit two’s-complement numbers. This value is then sign extended to produce the 64-bit value for the destination.** The `movabsq` instruction can have an arbitrary 64-bit immediate value as its source operand and can only have a register as a destination.
+
+**The movl instruction sets the low-order 4 bytes to FFFFFFFF, but it also sets the high-order 4 bytes to 00000000.**Note the absence of an explicit instruction to zero-extend a 4-byte source value to an 8-byte destination in Figure 3.5. Such an instruction would logically be named movzlq, but this instruction does not exist. Instead, this type of data movement can be implemented using a movl instruction having a register as the
+destination.
 
 [Why is the copying instruction usually named MOV?](https://softwareengineering.stackexchange.com/questions/222254/why-is-the-copying-instruction-usually-named-mov)
 
@@ -236,7 +239,7 @@ ret
 
 #### Integer arithmetic operations
 
-| Instruction | Description | Note |
+| Instruction | Description | Effect |
 |-|-|-|
 | `leaT` S, D | Load effective address | D = &S |
 | `incT` D | Increment | ++D |
@@ -264,3 +267,45 @@ ret
 | `divT` S | Unsigned divide | `%rax` = `%rdx:%rax` / S; `%rdx` = `%rdx:%rax` % S  |
 | `cqto` | Convert to oct word (16-byte) (SignExtend) | copies sign bit from `%rax` across all of `%rdx` |
 
+## 3.6 Control
+
+### 3.6.1 Condition Codes
+
+In addition to the integer registers, the CPU maintains a set of single-bit condition code registers describing attributes of the most recent arithmetic or logical operation.
+
+| Flag | C expression | Description |
+|-|-|-|
+| CF | `(unsigned) t < (unsigned) a` | Unsigned overflow |
+| ZF | `(t == 0)` | Zero |
+| SF | `(t < 0)` | Negative |
+| OF | `(a<0 == b<0) && (t<0 != a<0)` | Signed overflow |
+
+The `leaq` instruction does not alter any condition codes, since it is intended to be used in address computations. Otherwise, all of the instructions listed in Figure 3.10 cause the condition codes to be set. For the logical operations, such as `xor`, the carry and overflow flags are set to zero. For the shift operations, the carry flag is set to the last bit shifted out, while the overflow flag is set to zero. For reasons that we will not delve into, the `inc` and `dec` instructions set the overflow and zero flags, but they leave the carry flag unchanged.
+
+**The `cmp` instructions set the condition codes according to the differences of their two operands. They behave in the same way as the `sub` instructions, except that they set the condition codes without updating their destinations.** It set the zero flag if the two operands are equal. The other flags can be used to determine ordering relations between the two operands.
+
+The test instructions behave in the same manner as the and instructions, except that they set the condition codes without altering their destinations.
+
+| Instruction | Based on |
+|-|-|
+| `cmpT` $S_1,S_2$ | $S_2-S_1$ |
+| `testT` $S_1,S_2$ | $S_1\&S_2$ |
+
+### 3.6.2 Accessing the Condition Codes
+
+Aset instruction has either one of the low-order single-byte register elements (Figure 3.2) or a single-byte memory location as its destination, setting this byte to either 0 or 1. To generate a 32-bit or 64-bit result, we must also clear the high-order bits. *(So why don't we typedef int8_t bool ?)*
+
+| Instruction | Synonym | Set condition | Effect |
+|-|-|-|-|
+| `sete` D | `setz` | Equal / zero | D = ZF |
+| `setne` D | `setnz` | Not equal / not zero | D = ~ZF |
+| `sets` D | | Negative | D = SF |
+| `setns` D | | Nonegative | D = ~SF |
+| `setg` D | `setnle` | Greater (signed >) | D = ~(SF^OF)&~ZF |
+| `setge` D | `setnl` | Greater or equal (signed >=) | D = ~(SF^OF) |
+| `setl` D | `setnge` | Less (signed <) | D =SF^OF |
+| `setle` D | `setnge` | Less or equal (signed <=) | D = (SF^OF)|ZF |
+| `seta` D | `setnbe` | Above (unsigned >) | D = ~CF&~ZF |
+| `setae` D | `setnb` | Above or equal (unsigned >=) | D = ~CF |
+| `setb` D | `setnae` | Below (unsigned <) | D = CF |
+| `setbe` D | `setna` | Below (unsigned <=) | D = CF | ZF |
